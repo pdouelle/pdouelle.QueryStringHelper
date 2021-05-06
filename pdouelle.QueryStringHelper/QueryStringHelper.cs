@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Web;
@@ -9,24 +10,43 @@ namespace pdouelle.QueryStringHelper
         public static string GetQueryString(this object obj)
         {
             var queryParameters = new List<string>();
-            
+
             PropertyInfo[] properties = obj.GetType().GetProperties();
-            
+
             foreach (PropertyInfo propertyInfo in properties)
             {
-                if (propertyInfo.GetValue(obj, null) != null)
+                var value = propertyInfo.GetValue(obj, null);
+
+                if (value != null)
                 {
                     var propertyName = propertyInfo.Name;
-                    var propertyValue = propertyInfo.GetValue(obj, null)?.ToString();
-                    var propertyValueEncoded = HttpUtility.UrlEncode(propertyValue);
 
-                    queryParameters.Add(propertyName + "=" + propertyValueEncoded);
+                    if (value is IEnumerable enumerable)
+                    {
+                        foreach (var property in enumerable)
+                        {
+                            queryParameters.Add(Factory(propertyName, property));
+                        }
+                    }
+                    else
+                    {
+                        queryParameters.Add(Factory(propertyName, value));
+                    }
                 }
             }
 
             var queryString = string.Join("&", queryParameters);
-            
+
             return "?" + queryString;
+        }
+
+        private static string Factory(string propertyName, object property)
+        {
+            var propertyValue = property?.ToString();
+            var propertyValueEncoded = HttpUtility.UrlEncode(propertyValue);
+            var result = propertyName + "=" + propertyValueEncoded;
+
+            return result;
         }
     }
 }

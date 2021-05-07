@@ -21,7 +21,7 @@ namespace pdouelle.QueryStringHelper
                 {
                     var propertyName = propertyInfo.Name;
 
-                    if (value is IEnumerable enumerable)
+                    if (value is IEnumerable enumerable && value.GetType() != typeof(string))
                     {
                         foreach (var property in enumerable)
                         {

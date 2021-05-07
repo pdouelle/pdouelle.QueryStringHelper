@@ -6,5 +6,6 @@ namespace pdouelle.QueryStringHelper.Debug
     {
         public bool IncludeBlobs { get; set; }
         public Guid[] NotificationTemplateIds { get; set; }
+        public string Article { get; set; } = "TR";
     }
 }

@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Web;
+using System.Text.Json.Serialization;
 
 namespace pdouelle.QueryStringHelper
 {
@@ -19,7 +22,17 @@ namespace pdouelle.QueryStringHelper
 
                 if (value != null)
                 {
-                    var propertyName = propertyInfo.Name;
+                    Attribute attribute = propertyInfo.GetCustomAttributes(typeof(JsonPropertyNameAttribute)).SingleOrDefault();
+
+                    string propertyName;
+
+                    if (attribute != null)
+                    {
+                        var jsonPropertyName = attribute as JsonPropertyNameAttribute;
+                        propertyName = jsonPropertyName.Name;
+                    }
+                    else
+                        propertyName = propertyInfo.Name;
 
                     if (value is IEnumerable enumerable && value.GetType() != typeof(string))
                     {
